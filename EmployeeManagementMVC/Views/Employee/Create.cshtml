@@ -1,0 +1,191 @@
+﻿@model EMP.model.Employee
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Create</h2>
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div style="width:400px; height:auto;margin-left:100px;margin-top:100px;" data-bind="with: MyModel">
+        <div class="from-group">
+            <label>username:</label>
+            <input type="text" class="form-control" id="FullName" data-bind="value: FullName" />
+
+        </div>
+        <div class="from-group">
+            <label>phone:</label>
+            <input type="text" class="form-control" id="Phone" data-bind="value: Phone" />
+
+        </div>
+        <div class="from-group">
+            <label>Address:</label>
+            <input type="text" class="form-control" id="Address" data-bind="value: Address" />
+
+        </div>
+        <div class="from-group">
+            <label>Email:</label>
+            <input type="text" class="form-control" id="Email" data-bind="value: Email" />
+
+        </div>
+        <div class="from-group">
+            <label>DOB:</label>
+            <input type="text" class="form-control" id="DOB" data-bind="value: DOB" />
+
+        </div>
+        <div class="from-group">
+            <label>Citizenship:</label>
+            <input type="text" class="form-control" id="Citizenship" data-bind="value: Citizenship" />
+
+        </div>
+        <div class="from-group">
+            <label>gender:</label>
+            <select class="form-control" data-bind="
+                                 value: GenderID,
+                                  options: $root.GenderList,
+                                 optionsValue: 'Value',
+                                 optionsText: 'Text',
+                                    optionsCaption: '---SELECT---'" id="ddlGender">
+            </select>
+
+        </div>
+        <button class="btn btn-primary" data-bind="event: {click: $root.SaveInformation}" id="btnAddInformation">submit</button>
+
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+<script src="~/libs/jquery-ui-1.12.1.custom/jquery-ui.min.js"></script>
+<script src="~/Scripts/jquery-3.4.1.js"></script>
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script src="~/js/knockout-3.3.0.js"></script>
+<script>
+    function IndexVM() {
+        const self = this;
+
+        var isNullOrEmpty = function (str) {
+            if (str === undefined || str === null) {
+                return true;
+            } else if (typeof str === "string") {
+                return (str.trim() === "");
+            } else {
+                return false;
+            }
+        };
+
+        const models = {
+            MyModel: function (item) {
+                debugger;
+
+                item = item || {};
+                this.FullName = ko.observable(item.FullName || "");
+                this.Address = ko.observable(item.Address || "");
+                this.Email = ko.observable(item.Email || "");
+                this.Phone = ko.observable(item.Phone || "");
+                this.Citizenship = ko.observable(item.Citizenship || "");
+
+
+
+                this.GenderID = ko.observable(item.GenderID || "");
+                this.GenderName = ko.observable(item.GenderName || "");
+                this.DOB = ko.observable(item.DOB || "")
+
+                debugger;
+
+            },
+            UiElements: function () {
+                self.MyModel = ko.observable(new models.MyModel());
+                self.DataList = ko.observableArray([]);
+                self.GenderList = ko.observableArray([
+                    { Text: 'Male', Value: '1' },
+                    { Text: 'Female', Value: '0' }
+                ]);
+
+            },
+        };
+
+        self.SaveInformation = function () {
+
+            if (UiEvents.validate.SaveValidation()) {
+
+
+
+            }
+        };
+
+
+
+        const UiEvents = {
+            validate: {
+                SaveValidation: function () {
+                    if (isNullOrEmpty(self.MyModel().FullName())) {
+                        alert("enter the name!!!");
+                        return false;
+                    } else if (isNullOrEmpty(self.MyModel().Address())) {
+                        alert("password cannot be empty...!!!");
+                        return false;
+
+                    } else if (isNullOrEmpty(self.MyModel().Citizenship())) {
+                        alert("citizenship cannot be empty...!!!");
+                        return false;
+
+                    } else if (isNullOrEmpty(self.MyModel().GenderID())) {
+                        alert("Gender cannot be empty...!!!");
+                        return false;
+
+                    }
+                    else {
+
+                        self.MyModel().GenderName((self.GenderList().find(X => X.Value == self.MyModel().GenderID()) || {}).Text);
+
+
+                        $.ajax({
+                            type: "POST",
+                            url: '@Url.Action("Create")',
+                            data: JSON.stringify(ko.toJS(self.MyModel())),
+                            dataType: "json",
+
+                            contentType: "application/json; charset=utf-8",
+
+                            success: function (data) {
+                                alert("registratio successfull!!");
+                            }
+
+                        })
+
+
+                        return true;
+                    }
+                }
+            },
+
+
+
+        };
+
+        function Init() {
+            models.UiElements();
+
+        }
+        Init();
+    }
+
+    var obj;
+
+    $(document).ready(function () {
+        obj = new IndexVM();
+        ko.applyBindings(obj);
+
+    });
+</script>

@@ -1,0 +1,98 @@
+﻿@model IEnumerable<EMP.model.Report>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+
+
+<h3> view by name</h3>
+<div class="form-group">
+    <label> enter employee-name</label>
+    <input type="text" id="txtEmployeeName" class="form-control" placeholder="enter full name" />
+    <button class="btn btn-success" id="btnSubmit">search</button>
+</div>
+
+<table id="tblDemo" style="margin-left:-50px;margin-right:50px;width:120%;" class=" table-bordered table-striped table-responsive table-hover" >
+    <thead>
+        <tr>
+            
+            
+            <th align="left" class="Reportth">EmployeeCode</th>
+            <th align="left" class="Reportth">Employee</th>
+            <th align="left" class="Reportth">Citizenship</th>
+            <th align="left" class="Reportth">ProjectCode</th>
+            <th align="left" class="Reportth">Project</th>
+            <th align="left" class="Reportth">Position</th>
+            <th align="left" class="Reportth">Budget</th>
+            <th align="left" class="Reportth" width="100px">Starting Date</th>
+            <th align="left" class="Reportth">End Date</th>
+            <th align="left" class="Reportth">Estimated Date</th>
+            <th align="left" class="Reportth">TimeInMonths</th>
+            <th align="left" class="Reportth">Description</th>
+
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+@section Scripts
+{
+    <script>
+
+
+
+        $("#btnSubmit").click(function () {
+           
+            var Name = $("#txtEmployeeName").val();
+            if (!Name) {
+                alert("insert name!")
+                return;
+            }
+           
+            $("#tblDemo tbody tr").remove();
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetReport")',
+                //dataType: 'json',
+                data: { Name },
+                success: function (data) {
+                    console.log(data);
+                    var items = '';
+                    $.each(data, function (i, item) {
+
+                        var rows = "<tr>"
+
+                            + "<td class='Reporttd'>" + item.EmployeeCode + "</td>"
+                            + "<td class='Reporttd'>" + item.Employee + "</td>"
+                            + "<td class='Reporttd'>" + item.Citizenship + "</td>"
+                            + "<td class='Reporttd'>" + item.ProjectCode + "</td>"
+                            + "<td class='Reporttd'>" + item.Project + "</td>"
+                            + "<td class='Reporttd'>" + item.Position + "</td>"
+                            + "<td class='Reporttd'>" + item.Budget + "</td>"
+                            + "<td class='Reporttd' >" +item.StartDate + "</td>"
+                          /*  + "<td class='prtoducttd'>"+(item.StartDate.fomat('DD-MM-YYYY')); + "</td>"*/
+                            + "<td class='Reporttd'>" + item.EndDate + "</td>"
+                            + "<td class='Reporttd'>" + item.EstimatedDate + "</td>"
+                            + "<td class='Reporttd'>" + item.TimeInMonths + "</td>"
+                            + "<td class='Reporttd'>" + item.Description + "</td>"
+
+                            + "</tr>";
+                        $('#tblDemo tbody').append(rows);
+                    });
+                },
+                error: function (ex) {
+                    var r = jQuery.parseJSON(response.responseText);
+                    alert("Message: " + r.Message);
+                    alert("StackTrace: " + r.StackTrace);
+                    alert("ExceptionType: " + r.ExceptionType);
+                }
+            });
+            return false;
+        });
+    </script>
+
+}
